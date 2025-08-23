@@ -1,21 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { MainLayout } from "@/components/layout/main-layout"
 import { PlanCard } from "@/components/subscription/plan-card"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { subscriptionService, type SubscriptionPlan, type UserSubscription } from "@/lib/subscription"
-import { CreditCard, Calendar, AlertCircle } from "lucide-react"
+import { CreditCard, Calendar, AlertCircle, Loader2 } from "lucide-react"
 
 export default function SubscriptionPage() {
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const [currentSubscription, setCurrentSubscription] = useState<UserSubscription | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [upgradeLoading, setUpgradeLoading] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     Promise.all([subscriptionService.getPlans(), subscriptionService.getCurrentSubscription()])
       .then(([plansData, subscriptionData]) => {
         // Mark current plan
@@ -30,6 +34,19 @@ export default function SubscriptionPage() {
         setIsLoading(false)
       })
   }, [])
+
+  // 防止水合不匹配 - 等待客户端挂载和翻译准备完成
+  if (!mounted || !ready) {
+    return (
+      <ProtectedRoute>
+        <MainLayout>
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  }
 
   const handlePlanSelect = async (planId: string) => {
     setUpgradeLoading(true)
@@ -60,7 +77,7 @@ export default function SubscriptionPage() {
       <ProtectedRoute>
         <MainLayout>
           <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading subscription...</p>
+            <p className="text-muted-foreground" suppressHydrationWarning>{t("loadingSubscription")}</p>
           </div>
         </MainLayout>
       </ProtectedRoute>
@@ -73,8 +90,8 @@ export default function SubscriptionPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center">
-            <h1 className="heading text-3xl text-foreground mb-2">Subscription & Billing</h1>
-            <p className="body-text text-muted-foreground">Choose the plan that works best for you and your team</p>
+            <h1 className="heading text-3xl text-foreground mb-2" suppressHydrationWarning>{t("subscriptionBilling")}</h1>
+            <p className="body-text text-muted-foreground" suppressHydrationWarning>{t("subscriptionDescription")}</p>
           </div>
 
           {/* Current Subscription Status */}
@@ -83,28 +100,28 @@ export default function SubscriptionPage() {
               <CardHeader>
                 <CardTitle className="heading flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
-                  Current Subscription
+                  <span suppressHydrationWarning>{t("currentSubscription")}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold">{currentPlan?.name} Plan</span>
-                      <Badge variant={currentSubscription.status === "active" ? "default" : "secondary"}>
-                        {currentSubscription.status}
+                      <span className="font-semibold" suppressHydrationWarning>{currentPlan?.name} {t("plan")}</span>
+                      <Badge variant={currentSubscription.status === "active" ? "default" : "secondary"} suppressHydrationWarning>
+                        {t(currentSubscription.status)}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1" suppressHydrationWarning>
                         <Calendar className="h-4 w-4" />
-                        Renews {currentSubscription.currentPeriodEnd.toLocaleDateString()}
+                        {t("renews")} {currentSubscription.currentPeriodEnd.toLocaleDateString()}
                       </span>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-bold">${currentPlan?.price || 0}</div>
-                    <div className="text-sm text-muted-foreground">per {currentPlan?.interval}</div>
+                    <div className="text-sm text-muted-foreground" suppressHydrationWarning>{t("per")} {currentPlan?.interval}</div>
                   </div>
                 </div>
 
@@ -112,9 +129,9 @@ export default function SubscriptionPage() {
                   <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2">
                     <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
                     <div className="text-sm">
-                      <p className="font-medium text-amber-800">Subscription Ending</p>
-                      <p className="text-amber-700">
-                        Your subscription will end on {currentSubscription.currentPeriodEnd.toLocaleDateString()}
+                      <p className="font-medium text-amber-800" suppressHydrationWarning>{t("subscriptionEnding")}</p>
+                      <p className="text-amber-700" suppressHydrationWarning>
+                        {t("subscriptionEndDate", { date: currentSubscription.currentPeriodEnd.toLocaleDateString() })}
                       </p>
                     </div>
                   </div>
@@ -125,7 +142,7 @@ export default function SubscriptionPage() {
 
           {/* Pricing Plans */}
           <div>
-            <h2 className="heading text-2xl text-center mb-6">Choose Your Plan</h2>
+            <h2 className="heading text-2xl text-center mb-6" suppressHydrationWarning>{t("chooseYourPlan")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {plans.map((plan) => (
                 <PlanCard key={plan.id} plan={plan} onSelect={handlePlanSelect} isLoading={upgradeLoading} />
@@ -136,15 +153,15 @@ export default function SubscriptionPage() {
           {/* Billing History */}
           <Card>
             <CardHeader>
-              <CardTitle className="heading">Billing History</CardTitle>
-              <CardDescription className="body-text">View your past invoices and payments</CardDescription>
+              <CardTitle className="heading" suppressHydrationWarning>{t("billingHistory")}</CardTitle>
+              <CardDescription className="body-text" suppressHydrationWarning>{t("billingHistoryDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
                 <CreditCard className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Billing History</h3>
-                <p className="text-muted-foreground">
-                  Your billing history will appear here once you make your first payment
+                <h3 className="text-lg font-semibold mb-2" suppressHydrationWarning>{t("noBillingHistory")}</h3>
+                <p className="text-muted-foreground" suppressHydrationWarning>
+                  {t("billingHistoryWillAppear")}
                 </p>
               </div>
             </CardContent>
