@@ -133,6 +133,11 @@ class AuthService {
    */
   async getCurrentUser(): Promise<User | null> {
     try {
+      // 先检查是否有token，没有token直接返回null
+      if (!this.isLoggedIn()) {
+        return null;
+      }
+
       const response = await apiClient.get<User>('/api/v1/auth/me');
       
       if (response.success && response.data) {
@@ -140,8 +145,11 @@ class AuthService {
       }
       
       return null;
-    } catch (error) {
-      console.error('Get current user error:', error)
+    } catch (error: any) {
+      // 只有在非401错误时才打印错误日志
+      if (error?.status !== 401) {
+        console.error('Get current user error:', error)
+      }
       // 如果获取用户信息失败，清除token
       TokenManager.clearTokens();
       return null;

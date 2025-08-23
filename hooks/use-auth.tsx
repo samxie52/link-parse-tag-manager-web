@@ -21,12 +21,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check for existing session on mount
-    authService
-      .getCurrentUser()
-      .then(setUser)
-      .catch(() => setUser(null))
-      .finally(() => setIsLoading(false))
+    // 只有在有token的情况下才检查用户状态
+    const checkAuthState = async () => {
+      try {
+        // 先检查本地是否有token
+        if (!authService.isLoggedIn()) {
+          setUser(null)
+          setIsLoading(false)
+          return
+        }
+
+        // 有token时才调用getCurrentUser
+        const currentUser = await authService.getCurrentUser()
+        setUser(currentUser)
+      } catch (error) {
+        // 静默处理错误，避免在控制台显示401错误
+        setUser(null)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkAuthState()
   }, [])
 
   const login = async (email: string, password: string) => {
