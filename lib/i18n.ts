@@ -148,19 +148,59 @@ const resources = {
       billingHistoryDescription: "View your past invoices and payments",
       noBillingHistory: "No Billing History",
       billingHistoryWillAppear: "Your billing history will appear here once you make your first payment",
+
+      // Share Components
+      // UrlInput
+      parseLinkContent: "Parse Link Content",
+      url: "URL",
+      urlPlaceholder: "https://example.com/article",
+      parseLink: "Parse Link",
+      aiParse: "AI Parse",
+      failedToParseUrl: "Failed to parse URL",
+
+      // LinkPreview
+      linkPreview: "Link Preview",
+      cancel: "Cancel",
+      edit: "Edit",
+      close: "Close",
+      title: "Title",
+      description: "Description",
+      by: "By",
+      content: "Content",
+      contentPlaceholder: "Add your thoughts, summary, or additional context...",
+      tags: "Tags",
+      addTag: "Add Tag",
+      saveDraft: "Save Draft",
+      enhanceWithAi: "Enhance with AI",
+      share: "Share",
+      visit: "Visit",
+
+      // ContentLibrary
+      contentLibrary: "Content Library",
+      searchContent: "Search content...",
+      all: "All",
+      aiEnhanced: "AI Enhanced",
+      drafts: "Drafts",
+      published: "Published",
+      noContentFound: "No content found",
+      tryAdjustingFilters: "Try adjusting your search or filters",
+      visitLink: "Visit Link",
+      archive: "Archive",
+      shares: "shares",
+      draft: "Draft",
     },
   },
   zh: {
     translation: {
       // App Title
-      appTitle: "微信链接管理器",
+      appTitle: "链接内容管理器",
       appDescription: "专业的社交媒体内容管理平台",
 
       // Login Page
       welcomeBack: "欢迎回来",
-      signInDescription: "登录您的微信链接管理器账户",
+      signInDescription: "登录您的链接内容管理器账户",
       createAccount: "创建账户",
-      registerDescription: "创建您的微信链接管理器账户",
+      registerDescription: "创建您的链接内容管理器账户",
       resetPassword: "重置密码",
       resetDescription: "输入您的邮箱来重置密码",
       email: "邮箱",
@@ -294,6 +334,46 @@ const resources = {
       billingHistoryDescription: "查看您的过去的发票和付款",
       noBillingHistory: "没有计费历史",
       billingHistoryWillAppear: "您的计费历史将在您进行第一次付款后出现",
+
+      // Share Components
+      // UrlInput
+      parseLinkContent: "解析链接内容",
+      url: "网址",
+      urlPlaceholder: "https://example.com/article",
+      parseLink: "解析链接",
+      aiParse: "AI解析",
+      failedToParseUrl: "解析网址失败",
+
+      // LinkPreview
+      linkPreview: "链接预览",
+      cancel: "取消",
+      edit: "编辑",
+      close: "关闭",
+      title: "标题",
+      description: "描述",
+      by: "作者",
+      content: "内容",
+      contentPlaceholder: "添加您的想法、摘要或额外的上下文...",
+      tags: "标签",
+      addTag: "添加标签",
+      saveDraft: "保存草稿",
+      enhanceWithAi: "使用AI增强",
+      share: "分享",
+      visit: "访问",
+
+      // ContentLibrary
+      contentLibrary: "内容库",
+      searchContent: "搜索内容...",
+      all: "全部",
+      aiEnhanced: "AI增强",
+      drafts: "草稿",
+      published: "已发布",
+      noContentFound: "没有找到内容",
+      tryAdjustingFilters: "尝试调整您的搜索或筛选",
+      visitLink: "访问链接",
+      archive: "存档",
+      shares: "分享",
+      draft: "草稿",
     },
   },
 }

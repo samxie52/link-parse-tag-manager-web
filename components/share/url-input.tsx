@@ -2,7 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,9 +17,26 @@ interface UrlInputProps {
 }
 
 export function UrlInput({ onParsed }: UrlInputProps) {
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [url, setUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // 防止水合不匹配
+  if (!mounted || !ready) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin" />
+        </CardContent>
+      </Card>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +51,7 @@ export function UrlInput({ onParsed }: UrlInputProps) {
       onParsed(metadata)
       setUrl("")
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to parse URL")
+      setError(err instanceof Error ? err.message : t("failedToParseUrl"))
     } finally {
       setIsLoading(false)
     }
@@ -44,17 +62,17 @@ export function UrlInput({ onParsed }: UrlInputProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Link className="h-5 w-5" />
-          Parse Link Content
+          <span suppressHydrationWarning>{t("parseLinkContent")}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="url">URL</Label>
+            <Label htmlFor="url" suppressHydrationWarning>{t("url")}</Label>
             <Input
               id="url"
               type="url"
-              placeholder="https://example.com/article"
+              placeholder={t("urlPlaceholder")}
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               required
@@ -70,11 +88,11 @@ export function UrlInput({ onParsed }: UrlInputProps) {
           <div className="flex gap-2">
             <Button type="submit" disabled={isLoading || !url}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Parse Link
+              <span suppressHydrationWarning>{t("parseLink")}</span>
             </Button>
             <Button type="button" variant="outline" disabled={isLoading}>
               <Sparkles className="mr-2 h-4 w-4" />
-              AI Parse
+              <span suppressHydrationWarning>{t("aiParse")}</span>
             </Button>
           </div>
         </form>

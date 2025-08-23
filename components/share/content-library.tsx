@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Search, Filter, MoreHorizontal, Edit, Share2, Archive, Sparkles, ExternalLink } from "lucide-react"
+import { Search, Filter, MoreHorizontal, Edit, Share2, Archive, Sparkles, ExternalLink, Loader2 } from "lucide-react"
 import type { ParsedContent } from "@/lib/link-parser"
 
 interface ContentLibraryProps {
@@ -16,8 +17,27 @@ interface ContentLibraryProps {
 }
 
 export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // 防止水合不匹配
+  if (!mounted || !ready) {
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardContent className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
 
   const filteredContents = contents.filter((content) => {
     const matchesSearch =
@@ -37,12 +57,12 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="heading text-xl">Content Library</h2>
+        <h2 className="heading text-xl" suppressHydrationWarning>{t("contentLibrary")}</h2>
         <div className="flex gap-2">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search content..."
+              placeholder={t("searchContent")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 w-64"
@@ -57,11 +77,17 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="all">All ({contents.length})</TabsTrigger>
-          <TabsTrigger value="ai-enhanced">AI Enhanced ({contents.filter((c) => c.isAiEnhanced).length})</TabsTrigger>
-          <TabsTrigger value="drafts">Drafts ({contents.filter((c) => c.status === "draft").length})</TabsTrigger>
+          <TabsTrigger value="all">
+            <span suppressHydrationWarning>{t("all")} ({contents.length})</span>
+          </TabsTrigger>
+          <TabsTrigger value="ai-enhanced">
+            <span suppressHydrationWarning>{t("aiEnhanced")} ({contents.filter((c) => c.isAiEnhanced).length})</span>
+          </TabsTrigger>
+          <TabsTrigger value="drafts">
+            <span suppressHydrationWarning>{t("drafts")} ({contents.filter((c) => c.status === "draft").length})</span>
+          </TabsTrigger>
           <TabsTrigger value="published">
-            Published ({contents.filter((c) => c.status === "published").length})
+            <span suppressHydrationWarning>{t("published")} ({contents.filter((c) => c.status === "published").length})</span>
           </TabsTrigger>
         </TabsList>
 
@@ -70,8 +96,8 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
             <Card>
               <CardContent className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <p className="text-muted-foreground">No content found</p>
-                  <p className="text-sm text-muted-foreground mt-1">Try adjusting your search or filters</p>
+                  <p className="text-muted-foreground" suppressHydrationWarning>{t("noContentFound")}</p>
+                  <p className="text-sm text-muted-foreground mt-1" suppressHydrationWarning>{t("tryAdjustingFilters")}</p>
                 </div>
               </CardContent>
             </Card>
@@ -94,19 +120,19 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => onEdit(content)}>
                             <Edit className="mr-2 h-4 w-4" />
-                            Edit
+                            <span suppressHydrationWarning>{t("edit")}</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Share2 className="mr-2 h-4 w-4" />
-                            Share
+                            <span suppressHydrationWarning>{t("share")}</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <ExternalLink className="mr-2 h-4 w-4" />
-                            Visit Link
+                            <span suppressHydrationWarning>{t("visitLink")}</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Archive className="mr-2 h-4 w-4" />
-                            Archive
+                            <span suppressHydrationWarning>{t("archive")}</span>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -121,11 +147,11 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
                         {content.isAiEnhanced && (
                           <Badge className="bg-accent text-accent-foreground">
                             <Sparkles className="mr-1 h-3 w-3" />
-                            AI Enhanced
+                            <span suppressHydrationWarning>{t("aiEnhanced")}</span>
                           </Badge>
                         )}
-                        <Badge variant="outline" className="capitalize">
-                          {content.status}
+                        <Badge variant="outline" className="capitalize" suppressHydrationWarning>
+                          {t(content.status)}
                         </Badge>
                         {content.tags.slice(0, 2).map((tag, index) => (
                           <Badge key={index} variant="secondary">
@@ -136,7 +162,7 @@ export function ContentLibrary({ contents, onEdit }: ContentLibraryProps) {
 
                       {/* Stats */}
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{content.shareCount} shares</span>
+                        <span suppressHydrationWarning>{content.shareCount} {t("shares")}</span>
                         <span>{new Date(content.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
