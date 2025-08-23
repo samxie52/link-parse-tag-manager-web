@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { UserMenu } from "./user-menu"
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { LayoutDashboard, Share2, Users, User, CreditCard, Menu, X, Loader2 } from "lucide-react"
 
 const navigation = [
@@ -86,10 +87,13 @@ export function Sidebar() {
             })}
           </nav>
 
-          {/* User Menu */}
-          <div className="p-4 border-t border-sidebar-border">
+          {/* User Menu and Language Switcher */}
+          <div className="p-4 border-t border-sidebar-border flex justify-between">
             <div className="flex items-center justify-center">
               <UserMenu />
+            </div>
+            <div className="flex items-center justify-center">
+              <LanguageSwitcher />
             </div>
           </div>
         </div>

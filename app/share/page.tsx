@@ -1,14 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { MainLayout } from "@/components/layout/main-layout"
 import { UrlInput } from "@/components/share/url-input"
 import { LinkPreview } from "@/components/share/link-preview"
 import { ContentLibrary } from "@/components/share/content-library"
+import { Loader2 } from "lucide-react"
 import type { LinkMetadata, ParsedContent } from "@/lib/link-parser"
 
 export default function SharePage() {
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [currentMetadata, setCurrentMetadata] = useState<LinkMetadata | null>(null)
   const [savedContents, setSavedContents] = useState<ParsedContent[]>([
     // Mock data for demonstration
@@ -55,6 +59,23 @@ export default function SharePage() {
     },
   ])
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // 防止水合不匹配 - 等待客户端挂载和翻译准备完成
+  if (!mounted || !ready) {
+    return (
+      <ProtectedRoute>
+        <MainLayout>
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        </MainLayout>
+      </ProtectedRoute>
+    )
+  }
+
   const handleParsed = (metadata: LinkMetadata) => {
     setCurrentMetadata(metadata)
   }
@@ -78,9 +99,9 @@ export default function SharePage() {
         <div className="space-y-6">
           {/* Header */}
           <div>
-            <h1 className="heading text-3xl text-foreground">Share & Manage Links</h1>
-            <p className="body-text text-muted-foreground mt-1">
-              Parse links, enhance content with AI, and manage your shared content library
+            <h1 className="heading text-3xl text-foreground" suppressHydrationWarning>{t("shareManageLinks")}</h1>
+            <p className="body-text text-muted-foreground mt-1" suppressHydrationWarning>
+              {t("sharePageDescription")}
             </p>
           </div>
 

@@ -82,6 +82,10 @@ const resources = {
       monthlyGrowth: "{{percent}} from last month",
       newThisMonth: "{{count}} new this month",
       dailyGrowth: "{{percent}} from yesterday",
+
+      // Share Page
+      shareManageLinks: "Share & Manage Links",
+      sharePageDescription: "Parse links, enhance content with AI, and manage your shared content library",
     },
   },
   zh: {
@@ -162,6 +166,10 @@ const resources = {
       monthlyGrowth: "{{percent}} 从上个月",
       newThisMonth: "{{count}} 本月新增",
       dailyGrowth: "{{percent}} 从昨天",
+
+      // Share Page
+      shareManageLinks: "分享与管理链接",
+      sharePageDescription: "解析链接，使用AI增强内容，并管理您的共享内容库",
     },
   },
 }
