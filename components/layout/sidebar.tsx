@@ -1,24 +1,42 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { UserMenu } from "./user-menu"
-import { LayoutDashboard, Share2, Users, User, CreditCard, Menu, X } from "lucide-react"
+import { LayoutDashboard, Share2, Users, User, CreditCard, Menu, X, Loader2 } from "lucide-react"
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Share", href: "/share", icon: Share2 },
-  { name: "Groups", href: "/groups", icon: Users },
-  { name: "Profile", href: "/profile", icon: User },
-  { name: "Subscription", href: "/subscription", icon: CreditCard },
+  { nameKey: "dashboard", href: "/", icon: LayoutDashboard },
+  { nameKey: "share", href: "/share", icon: Share2 },
+  { nameKey: "groups", href: "/groups", icon: Users },
+  { nameKey: "profile", href: "/profile", icon: User },
+  { nameKey: "subscription", href: "/subscription", icon: CreditCard },
 ]
 
 export function Sidebar() {
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // 防止水合不匹配 - 等待客户端挂载和翻译准备完成
+  if (!mounted || !ready) {
+    return (
+      <div className="fixed inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border">
+        <div className="flex items-center justify-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -42,7 +60,7 @@ export function Sidebar() {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-sidebar-border">
-            <h1 className="heading text-xl text-sidebar-foreground">WeChat Link Manager</h1>
+            <h1 className="heading text-xl text-sidebar-foreground" suppressHydrationWarning>{t("appTitle")}</h1>
           </div>
 
           {/* Navigation */}
@@ -51,7 +69,7 @@ export function Sidebar() {
               const isActive = pathname === item.href
               return (
                 <Link
-                  key={item.name}
+                  key={item.nameKey}
                   href={item.href}
                   className={cn(
                     "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
@@ -62,7 +80,7 @@ export function Sidebar() {
                   onClick={() => setIsOpen(false)}
                 >
                   <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
+                  <span suppressHydrationWarning>{t(item.nameKey)}</span>
                 </Link>
               )
             })}

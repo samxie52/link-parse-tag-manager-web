@@ -69,6 +69,19 @@ const resources = {
       language: "Language",
       english: "English",
       chinese: "中文",
+
+      // Dashboard
+      contentTimeline: "Content Timeline",
+      contentTimelineDescription: "Manage your content and track performance in real-time",
+      filters: "Filters",
+      newContent: "New Content",
+      totalLinks: "Total Links",
+      aiEnhanced: "AI Enhanced",
+      teamMembers: "Team Members",
+      activeToday: "Active Today",
+      monthlyGrowth: "{{percent}} from last month",
+      newThisMonth: "{{count}} new this month",
+      dailyGrowth: "{{percent}} from yesterday",
     },
   },
   zh: {
@@ -136,6 +149,19 @@ const resources = {
       language: "语言",
       english: "English",
       chinese: "中文",
+
+      // Dashboard
+      contentTimeline: "内容时间线",
+      contentTimelineDescription: "管理您的内容并实时跟踪性能",
+      filters: "过滤器",
+      newContent: "新内容",
+      totalLinks: "总链接数",
+      aiEnhanced: "AI增强",
+      teamMembers: "团队成员",
+      activeToday: "今日活跃",
+      monthlyGrowth: "{{percent}} 从上个月",
+      newThisMonth: "{{count}} 本月新增",
+      dailyGrowth: "{{percent}} 从昨天",
     },
   },
 }
