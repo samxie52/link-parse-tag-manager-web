@@ -108,10 +108,20 @@ class ApiClient {
     };
 
     // 检查是否需要添加Authorization头部
-    const isAuthEndpoint = endpoint.startsWith('/api/v1/auth/') && 
-      !endpoint.includes('/protected/');
+    const publicAuthEndpoints = [
+      '/api/v1/auth/register',
+      '/api/v1/auth/login', 
+      '/api/v1/auth/refresh',
+      '/api/v1/auth/send-code',
+      '/api/v1/auth/reset-password',
+      '/api/v1/auth/wechat'
+    ];
     
-    if (!isAuthEndpoint) {
+    const isPublicEndpoint = publicAuthEndpoints.some(publicEndpoint => 
+      endpoint.startsWith(publicEndpoint)
+    );
+    
+    if (!isPublicEndpoint) {
       // 检查token是否即将过期，提前刷新
       if (TokenManager.isTokenExpiringSoon() && autoRetry) {
         await this.refreshToken();
@@ -137,7 +147,7 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       // 处理401未授权错误
-      if (response.status === 401 && !isAuthEndpoint && autoRetry) {
+      if (response.status === 401 && !isPublicEndpoint && autoRetry) {
         const newToken = await this.refreshToken();
         if (newToken) {
           // 重新发起请求

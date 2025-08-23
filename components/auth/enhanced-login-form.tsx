@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "@/hooks/use-auth"
@@ -20,7 +20,8 @@ type AuthMode = "login" | "register" | "reset"
 type LoginMethod = "email" | "phone" | "wechat"
 
 export function EnhancedLoginForm() {
-  const { t } = useTranslation()
+  const { t, ready } = useTranslation()
+  const [mounted, setMounted] = useState(false)
   const [authMode, setAuthMode] = useState<AuthMode>("login")
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("email")
   const [showPassword, setShowPassword] = useState(false)
@@ -43,6 +44,21 @@ export function EnhancedLoginForm() {
 
   const { login } = useAuth()
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Prevent hydration mismatch - wait for both mounting and translation ready
+  if (!mounted || !ready) {
+    return (
+      <Card className="w-full max-w-md">
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </CardContent>
+      </Card>
+    )
+  }
 
   // SMS countdown timer
   const startSmsCountdown = () => {
@@ -329,6 +345,7 @@ export function EnhancedLoginForm() {
             onClick={handleSendSms}
             disabled={smsSent || !phone}
             className="whitespace-nowrap bg-transparent"
+            suppressHydrationWarning
           >
             {smsSent ? `${smsCountdown}s` : t("sendSms")}
           </Button>
@@ -387,12 +404,20 @@ export function EnhancedLoginForm() {
             <TabsContent value="email" className="mt-4">
               <form onSubmit={getSubmitHandler()} className="space-y-4">
                 {renderEmailForm()}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? t("loading") : getSubmitText()}
+                </Button>
               </form>
             </TabsContent>
 
             <TabsContent value="phone" className="mt-4">
               <form onSubmit={getSubmitHandler()} className="space-y-4">
                 {renderPhoneForm()}
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? t("loading") : getSubmitText()}
+                </Button>
               </form>
             </TabsContent>
 
@@ -413,12 +438,20 @@ export function EnhancedLoginForm() {
               <TabsContent value="email" className="mt-4">
                 <form onSubmit={getSubmitHandler()} className="space-y-4">
                   {renderEmailForm()}
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isLoading ? t("loading") : getSubmitText()}
+                  </Button>
                 </form>
               </TabsContent>
 
               <TabsContent value="phone" className="mt-4">
                 <form onSubmit={getSubmitHandler()} className="space-y-4">
                   {renderPhoneForm()}
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isLoading ? t("loading") : getSubmitText()}
+                  </Button>
                 </form>
               </TabsContent>
             </Tabs>
@@ -438,16 +471,9 @@ export function EnhancedLoginForm() {
         )}
 
         {(error || success) && (
-          <Alert variant={error ? "destructive" : "default"} className="mb-4">
+          <Alert variant={error ? "destructive" : "default"} className="mb-4" suppressHydrationWarning>
             <AlertDescription>{error || success}</AlertDescription>
           </Alert>
-        )}
-
-        {loginMethod !== "wechat" && (
-          <Button type="submit" className="w-full" disabled={isLoading} onClick={getSubmitHandler()}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? t("loading") : getSubmitText()}
-          </Button>
         )}
 
         {authMode === "login" && (
