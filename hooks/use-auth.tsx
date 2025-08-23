@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     try {
       const user = await authService.login({ email, password })
-      localStorage.setItem("auth-token", "mock-token")
+      // authService.login已经自动保存了token，不需要手动设置mock token
       setUser(user)
     } finally {
       setIsLoading(false)

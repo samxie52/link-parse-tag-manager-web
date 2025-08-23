@@ -93,17 +93,11 @@ export function EnhancedLoginForm() {
     setError('');
 
     try {
-      // 调用登录API
-      const loginResponse = await authService.login({
-        email: email,
-        password: password, 
-      });
-
-      // 登录成功，token已经在authService.login中自动保存
-      console.log('登录成功:', loginResponse);
+      // 使用useAuth hook的login方法，这会自动更新AuthProvider状态
+      await login(email, password);
       
-      // 可以在这里添加成功提示
-      // 页面跳转将由路由守卫或父组件处理
+      // 登录成功，跳转到首页
+      console.log('登录成功，跳转到首页');
       router.push("/");
       
     } catch (err) {
