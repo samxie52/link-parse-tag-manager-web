@@ -33,5 +33,5 @@
   "resetEmailSent": "密码重置邮件发送成功",
   "wechatScanTip": "请使用微信扫描上方二维码",
   "useOtherMethod": "使用其他登录方式",
-  "demoCredentials": "演示账号: demo@example.com / password"
+  "demoCredentials": "演示账号: test@example.com / password123"
 }

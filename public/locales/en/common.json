@@ -33,5 +33,5 @@
   "resetEmailSent": "Password reset email sent successfully",
   "wechatScanTip": "Use WeChat to scan the QR code above",
   "useOtherMethod": "Use other login method",
-  "demoCredentials": "Demo: demo@example.com / password"
+  "demoCredentials": "Demo: test@example.com / password123"
 }

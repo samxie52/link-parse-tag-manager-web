@@ -44,7 +44,7 @@ const resources = {
       userAgreement: "User Agreement",
       noAccount: "Don't have an account?",
       registerNow: "Register now",
-      demoCredentials: "Demo credentials: demo@example.com / password",
+      demoCredentials: "Demo credentials: test@example.com / password",
 
       // Navigation
       dashboard: "Dashboard",
@@ -230,7 +230,7 @@ const resources = {
       userAgreement: "用户协议",
       noAccount: "还没有账户？",
       registerNow: "立即注册",
-      demoCredentials: "演示账户：demo@example.com / password",
+      demoCredentials: "演示账户：test@example.com / password",
 
       // Navigation
       dashboard: "仪表板",

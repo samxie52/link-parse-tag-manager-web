@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader2, Upload } from "lucide-react"
 import { groupsService, type Group } from "@/lib/groups"
 
 interface CreateGroupDialogProps {
@@ -26,15 +26,24 @@ interface CreateGroupDialogProps {
   onCreated: (group: Group) => void
 }
 
+interface CreateGroupFormData {
+  name: string
+  description: string
+  avatar_url: string
+  is_private: boolean
+  member_limit: number
+  allow_member_invites: boolean
+}
+
 export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroupDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CreateGroupFormData>({
     name: "",
     description: "",
-    isPrivate: false,
-    allowMemberInvites: true,
-    requireApproval: false,
-    defaultRole: "member" as "member" | "viewer",
+    avatar_url: "",
+    is_private: false,
+    member_limit: 5,
+    allow_member_invites: true,
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,13 +53,11 @@ export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroup
     try {
       const group = await groupsService.createGroup({
         name: formData.name,
-        description: formData.description,
-        isPrivate: formData.isPrivate,
-        settings: {
-          allowMemberInvites: formData.allowMemberInvites,
-          requireApproval: formData.requireApproval,
-          defaultRole: formData.defaultRole,
-        },
+        description: formData.description || undefined,
+        avatar_url: formData.avatar_url || undefined,
+        is_private: formData.is_private,
+        member_limit: formData.member_limit,
+        allow_member_invites: formData.allow_member_invites,
       })
 
       onCreated(group)
@@ -58,10 +65,10 @@ export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroup
       setFormData({
         name: "",
         description: "",
-        isPrivate: false,
-        allowMemberInvites: true,
-        requireApproval: false,
-        defaultRole: "member",
+        avatar_url: "",
+        is_private: false,
+        member_limit: 5,
+        allow_member_invites: true,
       })
     } catch (error) {
       console.error("Failed to create group:", error)
@@ -70,26 +77,37 @@ export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroup
     }
   }
 
+  const memberLimitOptions = [
+    { value: 5, label: "5 members" },
+    { value: 10, label: "10 members" },
+    { value: 25, label: "25 members" },
+    { value: 50, label: "50 members" },
+    { value: 100, label: "100 members" },
+  ]
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Group</DialogTitle>
           <DialogDescription>Set up a new group for team collaboration and content sharing.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
+            {/* Group Name - Required */}
             <div className="space-y-2">
-              <Label htmlFor="name">Group Name</Label>
+              <Label htmlFor="name">Group Name *</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="Marketing Team"
+                maxLength={100}
                 required
               />
             </div>
 
+            {/* Description - Optional */}
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -101,56 +119,81 @@ export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroup
               />
             </div>
 
+            {/* Avatar URL - Optional */}
+            <div className="space-y-2">
+              <Label htmlFor="avatar_url">Avatar URL</Label>
+              <div className="flex space-x-2">
+                <Input
+                  id="avatar_url"
+                  type="url"
+                  value={formData.avatar_url}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, avatar_url: e.target.value }))}
+                  placeholder="https://example.com/avatar.jpg"
+                  maxLength={500}
+                />
+                <Button type="button" variant="outline" size="icon" title="Upload Avatar">
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+              {formData.avatar_url && (
+                <div className="mt-2">
+                  <img
+                    src={formData.avatar_url}
+                    alt="Avatar preview"
+                    className="w-12 h-12 rounded-full object-cover border"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Member Limit */}
+            <div className="space-y-2">
+              <Label>Member Limit</Label>
+              <Select
+                value={formData.member_limit.toString()}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, member_limit: parseInt(value) }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {memberLimitOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value.toString()}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="space-y-4">
+              {/* Private Group */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Private Group</Label>
                   <p className="text-sm text-muted-foreground">Only invited members can join</p>
                 </div>
                 <Switch
-                  checked={formData.isPrivate}
-                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isPrivate: checked }))}
+                  checked={formData.is_private}
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, is_private: checked }))}
                 />
               </div>
 
+              {/* Allow Member Invites */}
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Allow Member Invites</Label>
-                  <p className="text-sm text-muted-foreground">Members can invite others</p>
+                  <p className="text-sm text-muted-foreground">Members can invite others to join</p>
                 </div>
                 <Switch
-                  checked={formData.allowMemberInvites}
-                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, allowMemberInvites: checked }))}
+                  checked={formData.allow_member_invites}
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, allow_member_invites: checked }))}
                 />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Require Approval</Label>
-                  <p className="text-sm text-muted-foreground">New members need approval</p>
-                </div>
-                <Switch
-                  checked={formData.requireApproval}
-                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, requireApproval: checked }))}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Default Role</Label>
-                <Select
-                  value={formData.defaultRole}
-                  onValueChange={(value: "member" | "viewer") =>
-                    setFormData((prev) => ({ ...prev, defaultRole: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="member">Member</SelectItem>
-                    <SelectItem value="viewer">Viewer</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           </div>
@@ -158,7 +201,7 @@ export function CreateGroupDialog({ open, onOpenChange, onCreated }: CreateGroup
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading || !formData.name}>
+            <Button type="submit" disabled={isLoading || !formData.name.trim()}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Group
             </Button>

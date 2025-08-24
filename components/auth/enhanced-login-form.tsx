@@ -222,7 +222,7 @@ export function EnhancedLoginForm() {
           <Input
             id="email"
             type="email"
-            placeholder="demo@example.com"
+            placeholder="test@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="pl-10"
