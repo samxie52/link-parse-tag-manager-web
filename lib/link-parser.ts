@@ -129,6 +129,22 @@ export async function enhanceWithAI(content: ParsedContent): Promise<ParsedConte
   return content
 }
 
+// 新的解析函数，返回完整的 ParseResponse
+export async function parseUrl(url: string, groupId: number = 1, forceAI: boolean = false): Promise<ParseResponse> {
+  try {
+    const response = await contentService.parseUrl({
+      url,
+      group_id: groupId,
+      force_ai: forceAI
+    })
+    
+    return response
+  } catch (error) {
+    console.error('Parse URL error:', error)
+    throw error
+  }
+}
+
 // 示例：获取内容详情的函数
 export async function getContentExample(): Promise<ParsedContent> {
   try {

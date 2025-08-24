@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import type { TagManagerProps } from './types'
 
 export function TagManager({
-  tags,
+  tags = [], // 确保默认值为空数组
   editable = false,
   onChange,
   className
@@ -18,9 +18,17 @@ export function TagManager({
   const [isAdding, setIsAdding] = useState(false)
   const [newTag, setNewTag] = useState('')
 
+  // 确保 tags 是数组并添加调试信息
+  const safeTags = Array.isArray(tags) ? tags : []
+  
+  // 调试信息
+  console.log('TagManager received tags:', tags)
+  console.log('TagManager safeTags:', safeTags)
+  console.log('TagManager safeTags.length:', safeTags.length)
+
   const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      const updatedTags = [...tags, newTag.trim()]
+    if (newTag.trim() && !safeTags.includes(newTag.trim())) {
+      const updatedTags = [...safeTags, newTag.trim()]
       onChange?.(updatedTags)
       setNewTag('')
       setIsAdding(false)
@@ -28,7 +36,7 @@ export function TagManager({
   }
 
   const handleRemoveTag = (tagToRemove: string) => {
-    const updatedTags = tags.filter(tag => tag !== tagToRemove)
+    const updatedTags = safeTags.filter(tag => tag !== tagToRemove)
     onChange?.(updatedTags)
   }
 
@@ -58,30 +66,56 @@ export function TagManager({
         )}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {tags.map((tag, index) => (
-          <Badge
-            key={index}
-            variant="secondary"
-            className={cn(
-              "text-xs",
-              editable && "pr-1"
-            )}
-          >
-            <span className="mr-1">{tag}</span>
-            {editable && (
-              <button
-                onClick={() => handleRemoveTag(tag)}
-                className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5 transition-colors"
-              >
-                <X className="h-2.5 w-2.5" />
-              </button>
-            )}
-          </Badge>
-        ))}
+      {/* 调试信息显示 - 临时添加用于调试 */}
+      <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+        <div>TagManager 调试信息:</div>
+        <div>接收到的 tags: {JSON.stringify(tags)}</div>
+        <div>处理后的 safeTags: {JSON.stringify(safeTags)}</div>
+        <div>safeTags 长度: {safeTags.length}</div>
+        <div>editable: {String(editable)}</div>
+        <div>isAdding: {String(isAdding)}</div>
+      </div>
 
-        {tags.length === 0 && !isAdding && (
-          <span className="text-sm text-muted-foreground italic">暂无标签</span>
+      <div className="flex flex-wrap gap-2">
+        {safeTags.length > 0 ? (
+          safeTags.map((tag, index) => (
+            <Badge
+              key={`${tag}-${index}`} // 使用更稳定的 key
+              variant="secondary"
+              className={cn(
+                "text-xs inline-flex items-center",
+                editable && "pr-1"
+              )}
+            >
+              <span className="mr-1">{tag}</span>
+              {editable && (
+                <button
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-1 hover:bg-destructive hover:text-destructive-foreground rounded-full p-0.5 transition-colors"
+                  type="button"
+                >
+                  <X className="h-2.5 w-2.5" />
+                </button>
+              )}
+            </Badge>
+          ))
+        ) : (
+          !isAdding && (
+            <span className="text-sm text-muted-foreground italic">暂无标签</span>
+          )
+        )}
+
+        {/* 添加标签按钮 - 在编辑模式下且不在添加状态时显示 */}
+        {editable && !isAdding && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsAdding(true)}
+            className="h-6 px-2 text-xs"
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            添加标签
+          </Button>
         )}
       </div>
 

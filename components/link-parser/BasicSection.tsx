@@ -38,6 +38,14 @@ export function BasicSection({
     return new Date(dateTime).toLocaleString('zh-CN')
   }
 
+  // 确保 tags 是数组并添加调试信息
+  const safeTags = Array.isArray(data.tags) ? data.tags : []
+  
+  // 调试信息 - 可以在开发时查看
+  console.log('BasicSection data:', data)
+  console.log('BasicSection tags:', data.tags)
+  console.log('BasicSection safeTags:', safeTags)
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -90,9 +98,17 @@ export function BasicSection({
           </div>
         )}
 
-        {/* 标签管理 */}
+        {/* 调试信息显示 - 临时添加用于调试 */}
+        <div className="p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+          <div>调试信息:</div>
+          <div>data.tags: {JSON.stringify(data.tags)}</div>
+          <div>safeTags: {JSON.stringify(safeTags)}</div>
+          <div>safeTags.length: {safeTags.length}</div>
+        </div>
+
+        {/* 标签管理 - 确保传递正确的 tags 数据 */}
         <TagManager
-          tags={data.tags}
+          tags={safeTags}
           editable={editable}
           onChange={(tags) => handleFieldChange('tags', tags)}
         />

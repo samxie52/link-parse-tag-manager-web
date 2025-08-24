@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Link, Sparkles } from "lucide-react"
-import { linkParser, type LinkMetadata } from "@/lib/link-parser"
+import { parseUrl } from "@/lib/link-parser"
+import type { ParseResponse } from "@/lib/api/api-types"
 
 interface UrlInputProps {
-  onParsed: (metadata: LinkMetadata) => void
+  onParsed: (parseResult: ParseResponse) => void
 }
 
 export function UrlInput({ onParsed }: UrlInputProps) {
@@ -47,8 +48,8 @@ export function UrlInput({ onParsed }: UrlInputProps) {
       // Validate URL
       new URL(url)
 
-      const metadata = await linkParser.parseUrl(url)
-      onParsed(metadata)
+      const result = await parseUrl(url)
+      onParsed(result)
       setUrl("")
     } catch (err) {
       setError(err instanceof Error ? err.message : t("failedToParseUrl"))
