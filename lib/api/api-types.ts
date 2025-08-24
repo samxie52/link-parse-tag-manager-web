@@ -61,22 +61,105 @@ export interface Content {
 export interface ParseRequest {
   url: string
   group_id: number
-  use_ai?: boolean
+  force_ai?: boolean
   ai_provider?: "baidu" | "alibaba" | "tencent"
 }
 
+// 更新的解析响应结构
 export interface ParseResponse {
-  content: Content
-  parse_result: {
-    platform: string
-    title: string
-    description: string
-    images: string[]
-    tags: string[]
-    metadata: Record<string, any>
-    confidence: number
-    is_ai_enhanced: boolean
+  success: boolean
+  data: {
+    parse_result: ParseResultData
+    quota_info?: QuotaInfo
   }
+  error?: {
+    code: string
+    message: string
+  }
+}
+
+export interface ParseResultData {
+  parse_type: "basic" | "ai_enhanced"
+  platform: string
+  basic: BasicParseResult
+  platform_metadata?: Record<string, any>
+  ai_metadata?: Record<string, any>
+}
+
+export interface BasicParseResult {
+  title: string
+  description: string
+  tags: string[]
+  thumbnail?: string
+  images?: string[]
+  videos?: string[]
+  author?: string
+  published_at?: string
+  confidence: number
+  parsed_at: string
+  parse_time_ms: number
+}
+
+export interface QuotaInfo {
+  ai_quota_used: number
+  ai_quota_limit: number
+  ai_quota_remaining: number
+}
+
+// 平台特定元数据类型
+export interface XHSPlatformMetadata {
+  note_id: string
+  author: string
+  author_id: string
+  like_count: string
+  share_count: string
+  comment_count: string
+  collect_count: string
+  view_count: string
+  published_at?: string
+  note_type: string
+  share_code: string
+  tags: string[]
+  images: string[]
+  videos: string[]
+  video_duration: string
+}
+
+export interface AMAPPlatformMetadata {
+  poi_id: string
+  place_name: string
+  address: string
+  latitude: number
+  longitude: number
+  coord_x: number
+  coord_y: number
+  telephone: string
+  province: string
+  city: string
+  district: string
+  adcode: string
+  poi_type: string
+  rating: string
+  open_time: string
+  share_type: string
+  user_token: string
+  typecode: string
+  gridcode: string
+  citycode: string
+  pcode: string
+  biz_type: string
+  tag: string
+  entr_location: string
+  exit_location: string
+  timestamp: string
+  recommend: string
+  discount_num: string
+  groupbuy_num: string
+  shopinfo: string
+  indoor_map: string
+  meal_ordering: string
+  opentime2: string
+  cost: string
 }
 
 // 组相关类型
